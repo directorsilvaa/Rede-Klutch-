@@ -107,9 +107,6 @@ export default function Team() {
                   >
                     {item.icon && <item.icon className="w-4 h-4 mr-2" />}
                     <span className="relative z-10">{item.name}</span>
-                    {item.hasDropdown && (
-                      <ChevronDown className="ml-1 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    )}
                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                   </Button>
                 </Link>
@@ -153,7 +150,6 @@ export default function Team() {
                     >
                       {item.icon && <item.icon className="w-4 h-4 mr-2" />}
                       {item.name}
-                      {item.hasDropdown && <ChevronDown className="ml-2 h-4 w-4" />}
                     </Button>
                   </Link>
                 ))}
