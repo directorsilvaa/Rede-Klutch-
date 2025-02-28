@@ -4,72 +4,14 @@ import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { Search, ChevronDown, Menu, Home, Ban, AlertTriangle } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { db } from "@/lib/db"
 
 const navItems = [
   { name: "Início", href: "/", icon: Home },
   { name: "Loja", href: "/loja" },
   { name: "Equipe", href: "/equipe" },
   { name: "Punições", href: "/punicoes" }
-]
-
-const punishments = [
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:54:17",
-    player: "yDiablo05",
-    reason: "Construção Inapropriada",
-    duration: "1d"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:53:25",
-    player: "23332_",
-    reason: "Uso de Trapaças",
-    duration: "Permanente"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:52:04",
-    player: "thebestdessejogo",
-    reason: "Construção Inapropriada",
-    duration: "19h"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:46:16",
-    player: "Raviina",
-    reason: "Uso de Trapaças",
-    duration: "Permanente"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:44:36",
-    player: "mediaevaleI",
-    reason: "Apologia ao Nazismo",
-    duration: "Permanente"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:43:55",
-    player: "TokyIaisod",
-    reason: "Uso de Trapaças",
-    duration: "Permanente"
-  },
-  {
-    type: "MUTE",
-    date: "24/02/2025, 23:42:16",
-    player: "xCaiowLITORANDO",
-    reason: "Violação das Regras da comunidade",
-    duration: "2h"
-  },
-  {
-    type: "BAN",
-    date: "24/02/2025, 23:37:42",
-    player: "DGKRR",
-    reason: "Uso de Trapaças",
-    duration: "Permanente"
-  }
 ]
 
 const filters = [
@@ -81,6 +23,24 @@ const filters = [
 export default function Punishments() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeFilters, setActiveFilters] = useState(filters)
+  const [punishments, setPunishments] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPunishments = async () => {
+      try {
+        // Get punishments from local database
+        const result = await db.getPunishments()
+        setPunishments(result)
+      } catch (error) {
+        console.error("Failed to fetch punishments:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPunishments()
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#1a1b1f]">
@@ -117,9 +77,6 @@ export default function Punishments() {
                   >
                     {item.icon && <item.icon className="w-4 h-4 mr-2" />}
                     <span className="relative z-10">{item.name}</span>
-                    {item.hasDropdown && (
-                      <ChevronDown className="ml-1 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                    )}
                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                   </Button>
                 </Link>
@@ -163,7 +120,6 @@ export default function Punishments() {
                     >
                       {item.icon && <item.icon className="w-4 h-4 mr-2" />}
                       {item.name}
-                      {item.hasDropdown && <ChevronDown className="ml-2 h-4 w-4" />}
                     </Button>
                   </Link>
                 ))}
@@ -208,7 +164,7 @@ export default function Punishments() {
         </div>
 
         <div className="text-gray-400 mb-6">
-          24.580 punições encontradas.
+          {loading ? "Carregando punições..." : `${punishments.length} punições encontradas.`}
         </div>
 
         {/* Punishments Table */}
@@ -224,43 +180,53 @@ export default function Punishments() {
               </tr>
             </thead>
             <tbody>
-              {punishments.map((punishment, index) => (
-                <motion.tr
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="border-b border-gray-700/50 hover:bg-gray-700/25 transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-                      punishment.type === "BAN" 
-                        ? "bg-red-500/20 text-red-500" 
-                        : "bg-yellow-500/20 text-yellow-500"
-                    }`}>
-                      {punishment.type === "BAN" ? (
-                        <Ban className="w-3 h-3 mr-1" />
-                      ) : (
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                      )}
-                      {punishment.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-400">{punishment.date}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center">
-                      <img
-                        src={`https://mc-heads.net/avatar/${punishment.player}`}
-                        alt={punishment.player}
-                        className="w-6 h-6 rounded mr-2"
-                      />
-                      <span className="text-gray-300">{punishment.player}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-400">{punishment.reason}</td>
-                  <td className="px-6 py-4 text-right text-gray-400">{punishment.duration}</td>
-                </motion.tr>
-              ))}
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-400">Carregando punições...</td>
+                </tr>
+              ) : punishments.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-400">Nenhuma punição encontrada.</td>
+                </tr>
+              ) : (
+                punishments.map((punishment, index) => (
+                  <motion.tr
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="border-b border-gray-700/50 hover:bg-gray-700/25 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                        punishment.type === "BAN" 
+                          ? "bg-red-500/20 text-red-500" 
+                          : "bg-yellow-500/20 text-yellow-500"
+                      }`}>
+                        {punishment.type === "BAN" ? (
+                          <Ban className="w-3 h-3 mr-1" />
+                        ) : (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
+                        {punishment.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-400">{punishment.date}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <img
+                          src={`https://mc-heads.net/avatar/${punishment.player}`}
+                          alt={punishment.player}
+                          className="w-6 h-6 rounded mr-2"
+                        />
+                        <span className="text-gray-300">{punishment.player}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-gray-400">{punishment.reason}</td>
+                    <td className="px-6 py-4 text-right text-gray-400">{punishment.duration}</td>
+                  </motion.tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

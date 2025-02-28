@@ -38,7 +38,6 @@ export default function Home() {
   const copyIP = () => {
     navigator.clipboard.writeText("redeklutch.sytes.net")
     toast({
-      title: "IP copiado!",
       description: "O IP do servidor foi copiado para sua área de transferência."
     })
   }
@@ -148,9 +147,6 @@ export default function Home() {
                       className="relative text-white hover:bg-white/10 transition-all duration-200 px-4 py-2 h-10"
                     >
                       <span className="relative z-10">{item.name}</span>
-                      {item.hasDropdown && (
-                        <ChevronDown className="ml-1 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
-                      )}
                       <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                     </Button>
                   </Link>
@@ -193,7 +189,6 @@ export default function Home() {
                         className="w-full justify-start text-white hover:bg-white/10"
                       >
                         {item.name}
-                        {item.hasDropdown && <ChevronDown className="ml-2 h-4 w-4" />}
                       </Button>
                     </Link>
                   ))}
